@@ -4,6 +4,7 @@ import Login from "./pages/Login";
 import TaskBoard from "./pages/TaskBoard";
 import TaskDetail from "./pages/TaskDetail";
 import TaskForm from "./pages/TaskForm";
+import EditTask from "./pages/EditTask";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -35,6 +36,14 @@ function App() {
           element={
             <ProtectedRoute>
               <TaskDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tasks/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditTask />
             </ProtectedRoute>
           }
         />
