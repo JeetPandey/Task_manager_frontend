@@ -1,45 +1,51 @@
 import { useState } from "react";
 
-function CommentForm({
-    onSubmit
-}) {
+function CommentForm({ addComment }) {
 
-    const [comment,
-        setComment] =
+    const [comment, setComment] =
         useState("");
 
-    const submit = (e) => {
+    const handleSubmit = (e) => {
 
         e.preventDefault();
 
-        onSubmit(comment);
+        if (!comment.trim()) {
+            return;
+        }
+
+        addComment(comment);
 
         setComment("");
     };
 
     return (
 
-        <form
-            onSubmit={submit}
-        >
+        <div className="mt-4">
 
-            <textarea
-                className="form-control"
-                value={comment}
-                onChange={(e) =>
-                    setComment(
-                        e.target.value
-                    )
-                }
-            />
+            <h4>Add Comment</h4>
 
-            <button
-                className="btn btn-primary mt-2"
-            >
-                Add Comment
-            </button>
+            <form onSubmit={handleSubmit}>
 
-        </form>
+                <textarea
+                    className="form-control mb-2"
+                    rows="3"
+                    value={comment}
+                    onChange={(e) =>
+                        setComment(
+                            e.target.value
+                        )
+                    }
+                />
+
+                <button
+                    className="btn btn-primary"
+                >
+                    Add Comment
+                </button>
+
+            </form>
+
+        </div>
     );
 }
 

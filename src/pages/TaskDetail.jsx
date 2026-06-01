@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import api from "../api/axios";
+
 import Navbar from "../components/Navbar";
+import CommentForm from "../components/CommentForm";
+import CommentList from "../components/CommentList";
 
 function TaskDetail() {
 
@@ -12,12 +15,17 @@ function TaskDetail() {
 
     const [task, setTask] = useState(null);
 
+    const [comments, setComments] =
+        useState([]);
+
     const [loading, setLoading] =
         useState(true);
 
     useEffect(() => {
 
         fetchTask();
+
+        fetchComments();
 
     }, []);
 
@@ -41,6 +49,47 @@ function TaskDetail() {
         } finally {
 
             setLoading(false);
+        }
+    };
+
+    const fetchComments = async () => {
+
+        try {
+
+            const response =
+                await api.get(
+                    `tasks/${id}/comments/`
+                );
+
+            setComments(
+                response.data
+            );
+
+        } catch (error) {
+
+            console.log(error);
+        }
+    };
+
+    const addComment = async (
+        commentText
+    ) => {
+
+        try {
+
+            await api.post(
+                "comments/",
+                {
+                    task: id,
+                    comment: commentText
+                }
+            );
+
+            fetchComments();
+
+        } catch (error) {
+
+            console.log(error);
         }
     };
 
@@ -162,6 +211,24 @@ function TaskDetail() {
                         </button>
 
                     </div>
+
+                </div>
+
+                <div className="mt-4">
+
+                    <h3>
+                        Comments
+                    </h3>
+
+                    <CommentForm addComment={addComment}/>
+
+                    <hr />
+
+                    <CommentList
+                        comments={
+                            comments
+                        }
+                    />
 
                 </div>
 

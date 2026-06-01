@@ -1,28 +1,44 @@
 function CommentList({ comments }) {
 
+    if (comments.length === 0) {
+
+        return (
+            <div className="alert alert-info">
+                No comments yet.
+            </div>
+        );
+    }
+
     return (
 
-        <>
-            {comments.map(comment => (
+        <div className="mt-3">
+
+            <h4>Comments</h4>
+
+            {comments.map((comment) => (
 
                 <div
                     key={comment.id}
-                    className="border p-2 mb-2"
+                    className="card mb-2"
                 >
 
-                    <strong>
-                        {comment.username}
-                    </strong>
+                    <div className="card-body">
 
-                    <p>
-                        {comment.comment}
-                    </p>
+                        <h6>
+                            {comment.user?.username}
+                        </h6>
+
+                        <p className="mb-0">
+                            {comment.comment}
+                        </p>
+
+                    </div>
 
                 </div>
 
             ))}
-        </>
 
+        </div>
     );
 }
 
