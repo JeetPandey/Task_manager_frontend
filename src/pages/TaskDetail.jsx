@@ -8,234 +8,139 @@ import CommentForm from "../components/CommentForm";
 import CommentList from "../components/CommentList";
 
 function TaskDetail() {
+  const { id } = useParams();
 
-    const { id } = useParams();
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
+  const [task, setTask] = useState(null);
 
-    const [task, setTask] = useState(null);
+  const [comments, setComments] = useState([]);
 
-    const [comments, setComments] =
-        useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const [loading, setLoading] =
-        useState(true);
+  useEffect(() => {
+    fetchTask();
 
-    useEffect(() => {
+    fetchComments();
+  }, []);
 
-        fetchTask();
+  const fetchTask = async () => {
+    try {
+      const response = await api.get(`tasks/${id}/`);
 
-        fetchComments();
-
-    }, []);
-
-    const fetchTask = async () => {
-
-        try {
-
-            const response =
-                await api.get(
-                    `tasks/${id}/`
-                );
-
-            setTask(
-                response.data
-            );
-
-        } catch (error) {
-
-            console.log(error);
-
-        } finally {
-
-            setLoading(false);
-        }
-    };
-
-    const fetchComments = async () => {
-
-        try {
-
-            const response =
-                await api.get(
-                    `tasks/${id}/comments/`
-                );
-
-            setComments(
-                response.data
-            );
-
-        } catch (error) {
-
-            console.log(error);
-        }
-    };
-
-    const addComment = async (
-        commentText
-    ) => {
-
-        try {
-
-            await api.post(
-                "comments/",
-                {
-                    task: id,
-                    comment: commentText
-                }
-            );
-
-            fetchComments();
-
-        } catch (error) {
-
-            console.log(error);
-        }
-    };
-
-    const deleteTask = async () => {
-
-        const confirmDelete =
-            window.confirm(
-                "Delete this task?"
-            );
-
-        if (!confirmDelete)
-            return;
-
-        try {
-
-            await api.delete(
-                `tasks/${id}/`
-            );
-
-            navigate("/tasks");
-
-        } catch (error) {
-
-            console.log(error);
-        }
-    };
-
-    if (loading) {
-
-        return (
-            <h3>
-                Loading...
-            </h3>
-        );
+      setTask(response.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (!task) {
+  const fetchComments = async () => {
+    try {
+      const response = await api.get(`tasks/${id}/comments/`);
 
-        return (
-            <h3>
-                Task not found
-            </h3>
-        );
+      setComments(response.data);
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    return (
+  const addComment = async (commentText) => {
+    try {
+      await api.post("comments/", {
+        task: id,
+        comment: commentText,
+      });
 
-        <>
-            <Navbar />
+      fetchComments();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-            <div className="container mt-4">
+  const deleteTask = async () => {
+    const confirmDelete = window.confirm("Delete this task?");
 
-                <div className="card">
+    if (!confirmDelete) return;
 
-                    <div className="card-body">
+    try {
+      await api.delete(`tasks/${id}/`);
 
-                        <h2>
-                            {task.name}
-                        </h2>
+      navigate("/tasks");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-                        <hr />
+  if (loading) {
+    return <h3>Loading...</h3>;
+  }
 
-                        <p>
-                            <strong>
-                                Code:
-                            </strong>
-                            {" "}
-                            {task.code}
-                        </p>
+  if (!task) {
+    return <h3>Task not found</h3>;
+  }
 
-                        <p>
-                            <strong>
-                                Description:
-                            </strong>
-                            {" "}
-                            {task.description}
-                        </p>
 
-                        <p>
-                            <strong>
-                                Priority:
-                            </strong>
-                            {" "}
-                            {task.priority}
-                        </p>
+  return (
+    <>
+      <Navbar />
 
-                        <p>
-                            <strong>
-                                Status:
-                            </strong>
-                            {" "}
-                            {task.status}
-                        </p>
+      <div className="container mt-4">
+        <div className="card">
+          <div className="card-body">
+            <h2>{task.name}</h2>
 
-                        <p>
-                            <strong>
-                                Due Date:
-                            </strong>
-                            {" "}
-                            {task.due_date}
-                        </p>
+            <hr />
 
-                        <button
-                            className="btn btn-warning me-2"
-                            onClick={() =>
-                                navigate(
-                                    `/tasks/edit/${id}`
-                                )
-                            }
-                        >
-                            Edit
-                        </button>
+            <p>
+              <strong>Code:</strong> {task.code}
+            </p>
 
-                        <button
-                            className="btn btn-danger"
-                            onClick={deleteTask}
-                        >
-                            Delete
-                        </button>
+            <p>
+              <strong>Description:</strong> {task.description}
+            </p>
 
-                    </div>
+            <p>
+              <strong>Priority:</strong> {task.priority}
+            </p>
 
-                </div>
+            <p>
+              <strong>Status:</strong> {task.status}
+            </p>
 
-                <div className="mt-4">
+            <p>
+              <strong>Due Date:</strong> {task.due_date}
+            </p>
+            {localStorage.getItem("is_staff") === "true" && (
+              <button
+                className="btn btn-warning me-2"
+                onClick={() => navigate(`/tasks/edit/${id}`)}
+              >
+                Edit
+              </button>
+            )}
+            {localStorage.getItem("is_staff") === "true" && (
+            <button className="btn btn-danger" onClick={deleteTask}>
+              Delete
+            </button>
+            )}
+          </div>
+            
+        </div>
 
-                    <h3>
-                        Comments
-                    </h3>
+        <div className="mt-4">
+          <h3>Comments</h3>
 
-                    <CommentForm addComment={addComment}/>
+          <CommentForm addComment={addComment} />
 
-                    <hr />
+          <hr />
 
-                    <CommentList
-                        comments={
-                            comments
-                        }
-                    />
-
-                </div>
-
-            </div>
-
-        </>
-    );
+          <CommentList comments={comments} />
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default TaskDetail;

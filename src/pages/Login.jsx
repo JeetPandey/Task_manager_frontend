@@ -15,40 +15,61 @@ function Login() {
   const [error, setError] =
     useState("");
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
 
     e.preventDefault();
 
     try {
 
-      const response =
-        await api.post(
-          "login/",
-          {
-            username,
-            password
-          }
+        const response =
+            await api.post(
+                "login/",
+                {
+                    username,
+                    password
+                }
+            );
+
+        localStorage.setItem(
+            "access",
+            response.data.access
         );
 
-      localStorage.setItem(
-        "access",
-        response.data.access
-      );
+        localStorage.setItem(
+            "refresh",
+            response.data.refresh
+        );
 
-      localStorage.setItem(
-        "refresh",
-        response.data.refresh
-      );
+        const profileResponse =
+            await api.get(
+                "profile/",
+                {
+                    headers: {
+                        Authorization:
+                        `Bearer ${response.data.access}`
+                    }
+                }
+            );
 
-      navigate("/tasks");
+        localStorage.setItem(
+            "is_staff",
+            profileResponse.data.is_staff
+        );
+
+        localStorage.setItem(
+            "username",
+            profileResponse.data.username
+        );
+
+        navigate("/tasks");
 
     } catch {
 
-      setError(
-        "Invalid credentials"
-      );
+        setError(
+            "Invalid credentials"
+        );
     }
-  };
+};
 
   return (
 

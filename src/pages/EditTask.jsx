@@ -11,6 +11,11 @@ import Navbar from "../components/Navbar";
 
 function EditTask() {
 
+    const isStaff =
+    localStorage.getItem(
+        "is_staff"
+    ) === "true";
+
     const { id } = useParams();
 
     const navigate =
@@ -40,7 +45,9 @@ function EditTask() {
 
     }, []);
 
-    const fetchTask = async () => {
+  const fetchTask = async () => {
+
+    try {
 
         const response =
             await api.get(
@@ -50,7 +57,26 @@ function EditTask() {
         setFormData(
             response.data
         );
-    };
+
+    } catch (error) {
+
+        if (
+            error.response &&
+            error.response.status === 404
+        ) {
+
+            alert(
+                "Task not found."
+            );
+
+            navigate("/tasks");
+
+            return;
+        }
+
+        console.log(error);
+    }
+};
 
     const handleChange = (e) => {
 
@@ -64,10 +90,11 @@ function EditTask() {
         });
     };
 
-    const handleSubmit =
-        async (e) => {
+    const handleSubmit = async (e) => {
 
-        e.preventDefault();
+    e.preventDefault();
+
+    try {
 
         await api.put(
             `tasks/${id}/`,
@@ -77,7 +104,67 @@ function EditTask() {
         navigate(
             `/tasks/${id}`
         );
-    };
+
+    } catch (error) {
+
+        if (
+            error.response &&
+            error.response.status === 403
+        ) {
+
+            alert(
+                "Only admin can edit tasks."
+            );
+
+            navigate("/tasks");
+
+            return;
+        }
+
+        if (
+            error.response &&
+            error.response.status === 404
+        ) {
+
+            alert(
+                "Task not found."
+            );
+
+            navigate("/tasks");
+
+            return;
+        }
+
+        alert(
+            "Something went wrong."
+        );
+
+        console.log(error);
+    }
+};
+
+
+if (!isStaff) {
+
+    return (
+
+        <>
+            <Navbar />
+
+            <div className="container mt-5">
+
+                <div className="alert alert-danger">
+
+                    Access Denied.
+                    Only admins can edit tasks.
+
+                </div>
+
+            </div>
+
+        </>
+    );
+}
 
     return (
 
