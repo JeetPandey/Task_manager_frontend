@@ -5,6 +5,7 @@ import TaskBoard from "./pages/TaskBoard";
 import TaskDetail from "./pages/TaskDetail";
 import TaskForm from "./pages/TaskForm";
 import EditTask from "./pages/EditTask";
+import KanbanBoard from "./pages/KanbanBoard";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -47,6 +48,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+    path="/kanban"
+    element={
+        <ProtectedRoute>
+            <KanbanBoard />
+        </ProtectedRoute>
+    }
+/>
       </Routes>
     </BrowserRouter>
   );
