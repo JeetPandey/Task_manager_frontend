@@ -1,158 +1,280 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import api from "../api/axios";
 
 import Navbar from "../components/Navbar";
 import TaskCard from "../components/TaskCard";
-import { Link } from "react-router-dom";
 
 function TaskBoard() {
 
-  const [tasks, setTasks] =
-    useState([]);
-    console.log(tasks);
+    const [tasks, setTasks] =
+        useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+    const [loading, setLoading] =
+        useState(true);
 
-  const [error, setError] =
-    useState("");
+    const [error, setError] =
+        useState("");
 
-  const [page, setPage] =
-    useState(1);
+    const [page, setPage] =
+        useState(1);
 
-  const [totalPages, setTotalPages] =
-    useState(1);
+    const [totalPages, setTotalPages] =
+        useState(1);
 
-  useEffect(() => {
+    const [search, setSearch] =
+        useState("");
 
-    fetchTasks(page);
+    const [statusFilter, setStatusFilter] =
+        useState("");
 
-  }, [page]);
+    const [priorityFilter, setPriorityFilter] =
+        useState("");
 
-  const fetchTasks = async (pageNumber) => {
+    const [sort, setSort] =
+        useState("");
 
-    try {
+    useEffect(() => {
 
-      setLoading(true);
+        fetchTasks();
 
-      const response =
-        await api.get(
-          `tasks/?page=${pageNumber}`
-        );
+    }, [
+        page,
+        search,
+        statusFilter,
+        priorityFilter,
+        sort
+    ]);
 
-      setTasks(
-        response.data.results
-      );
+    const fetchTasks = async () => {
 
-      console.log(response.data.results);
+        try {
 
-      setTotalPages(
-        response.data.total_pages
-      );
+            setLoading(true);
 
-    } catch (error) {
+            const response =
+                await api.get(
+                    `tasks/?page=${page}&search=${search}&status=${statusFilter}&priority=${priorityFilter}&sort=${sort}`
+                );
 
-      setError(
-        "Unable to load tasks."
-      );
+            setTasks(
+                response.data.results
+            );
 
-    } finally {
+            setTotalPages(
+                response.data.total_pages
+            );
 
-      setLoading(false);
-    }
-  };
+        } catch (error) {
 
-  return (
+            console.log(error);
 
-    <>
-      <Navbar />
+            setError(
+                "Unable to load tasks."
+            );
 
-      <div className="container mt-4">
+        } finally {
 
-        <h2 className="mb-4">
-          Task Board
-        </h2>
-        <div className="mb-3">
-
-    <Link
-        to="/tasks/create"
-        className="btn btn-success"
-    >
-        Add Task
-    </Link>
-
-</div>
-
-        {loading && (
-
-          <div className="alert alert-info">
-
-            Loading Tasks...
-
-          </div>
-        )}
-
-        {error && (
-
-          <div className="alert alert-danger">
-
-            {error}
-
-          </div>
-        )}
-
-        {!loading &&
-          tasks.map((task) => (
-
-            <TaskCard
-              key={task.id}
-              task={task}
-            />
-
-          ))
+            setLoading(false);
         }
+    };
 
-        <div className="d-flex justify-content-center gap-3 mt-4">
+    return (
 
-          <button
-            className="btn btn-secondary"
-            disabled={page === 1}
-            onClick={() =>
-              setPage(page - 1)
-            }
-          >
-            Previous
-          </button>
+        <>
+            <Navbar />
 
-          <span className="mt-2">
+            <div className="container mt-4">
 
-            Page {page}
-            {" "}
-            of
-            {" "}
-            {totalPages}
+                <h2 className="mb-4">
+                    Task Board
+                </h2>
 
-          </span>
+                <div className="mb-3">
 
-          <button
-            className="btn btn-secondary"
-            disabled={
-              page === totalPages
-            }
-            onClick={() =>
-              setPage(page + 1)
-            }
-          >
-            Next
-          </button>
+                    <Link
+                        to="/tasks/create"
+                        className="btn btn-success"
+                    >
+                        Add Task
+                    </Link>
 
-        </div>
+                </div>
 
-      </div>
+                <div className="row mb-4">
 
-    </>
-  );
+                    <div className="col-md-3">
+
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="form-control"
+                            value={search}
+                            onChange={(e) =>
+                                setSearch(
+                                    e.target.value
+                                )
+                            }
+                        />
+
+                    </div>
+
+                    <div className="col-md-3">
+
+                        <select
+                            className="form-control"
+                            value={statusFilter}
+                            onChange={(e) =>
+                                setStatusFilter(
+                                    e.target.value
+                                )
+                            }
+                        >
+
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option value="Pending">
+                                Pending
+                            </option>
+
+                            <option value="In Progress">
+                                In Progress
+                            </option>
+
+                            <option value="Completed">
+                                Completed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div className="col-md-3">
+
+                        <select
+                            className="form-control"
+                            value={priorityFilter}
+                            onChange={(e) =>
+                                setPriorityFilter(
+                                    e.target.value
+                                )
+                            }
+                        >
+
+                            <option value="">
+                                All Priority
+                            </option>
+
+                            <option value="High">
+                                High
+                            </option>
+
+                            <option value="Medium">
+                                Medium
+                            </option>
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div className="col-md-3">
+
+                        <select
+                            className="form-control"
+                            value={sort}
+                            onChange={(e) =>
+                                setSort(
+                                    e.target.value
+                                )
+                            }
+                        >
+
+                            <option value="">
+                                No Sorting
+                            </option>
+
+                            <option value="due_date">
+                                Due Date
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                {loading && (
+
+                    <div className="alert alert-info">
+                        Loading Tasks...
+                    </div>
+
+                )}
+
+                {error && (
+
+                    <div className="alert alert-danger">
+                        {error}
+                    </div>
+
+                )}
+
+                {!loading &&
+                    tasks.map((task) => (
+
+                        <TaskCard
+                            key={task.id}
+                            task={task}
+                        />
+
+                    ))
+                }
+
+                <div className="d-flex justify-content-center gap-3 mt-4">
+
+                    <button
+                        className="btn btn-secondary"
+                        disabled={page === 1}
+                        onClick={() =>
+                            setPage(page - 1)
+                        }
+                    >
+                        Previous
+                    </button>
+
+                    <span className="mt-2">
+
+                        Page {page}
+                        {" / "}
+                        {totalPages}
+
+                    </span>
+
+                    <button
+                        className="btn btn-secondary"
+                        disabled={
+                            page === totalPages
+                        }
+                        onClick={() =>
+                            setPage(page + 1)
+                        }
+                    >
+                        Next
+                    </button>
+
+                </div>
+
+            </div>
+
+        </>
+    );
 }
 
 export default TaskBoard;
